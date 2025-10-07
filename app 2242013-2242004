@@ -1,5 +1,5 @@
 # Juan Nicolas Buitrago León 2242013-
-# Johan Prado 2242003
+# Johan Prado 2242004
 class Nodo:
     def __init__(self, valor):
         self.valor = valor
@@ -165,4 +165,5 @@ if __name__ == "__main__":
             break
 
         else:
+
             print("Opción no válida. Intente de nuevo.")
