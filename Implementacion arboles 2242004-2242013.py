@@ -1,0 +1,169 @@
+# Juan Nicolas Buitrago León 2242013-
+# Johan Prado 2242004
+class Nodo:
+    def __init__(self, valor):
+        self.valor = valor
+        self.hijos = []
+
+class Arbol:
+    def __init__(self, raiz=None):
+        self.raiz = raiz
+
+    def agregar_nodo(self, valor, padre=None):
+        nuevo_nodo = Nodo(valor)
+        if padre is None:
+            if self.raiz is None:
+                self.raiz = nuevo_nodo
+            else:
+                print("El árbol ya tiene una raíz.")
+        else:
+            padre.hijos.append(nuevo_nodo)
+        return nuevo_nodo
+
+    def buscar_nodo(self, valor, nodo=None):
+        """Busca un nodo por su valor."""
+        if nodo is None:
+            nodo = self.raiz
+        if nodo is None:
+            return None
+        if nodo.valor == valor:
+            return nodo
+        for hijo in nodo.hijos:
+            resultado = self.buscar_nodo(valor, hijo)
+            if resultado:
+                return resultado
+        return None
+
+    def listar_nodos(self, nodo=None, nivel=0):
+        """Lista todos los nodos del árbol con su nivel."""
+        if nodo is None:
+            nodo = self.raiz
+        if nodo is None:
+            return []
+        nodos = [(nodo.valor, nivel)]
+        for hijo in nodo.hijos:
+            nodos.extend(self.listar_nodos(hijo, nivel + 1))
+        return nodos
+
+    def peso(self, nodo=None):
+        """Calcula el peso del árbol (número total de nodos)."""
+        if nodo is None:
+            nodo = self.raiz
+        if nodo is None:
+            return 0
+        peso_total = 1  # Contar el nodo actual
+        for hijo in nodo.hijos:
+            peso_total += self.peso(hijo)
+        return peso_total
+
+    def orden(self, nodo=None):
+        """Calcula el orden del árbol (máximo número de hijos de un nodo)."""
+        if nodo is None:
+            nodo = self.raiz
+        if nodo is None:
+            return 0
+        max_hijos = len(nodo.hijos)
+        for hijo in nodo.hijos:
+            max_hijos = max(max_hijos, self.orden(hijo))
+        return max_hijos
+
+    def altura(self, nodo=None):
+        """Calcula la altura del árbol (longitud del camino más largo desde la raíz)."""
+        if nodo is None:
+            nodo = self.raiz
+        if nodo is None:
+            return 0
+        if not nodo.hijos:
+            return 1
+        alturas_hijos = [self.altura(hijo) for hijo in nodo.hijos]
+        return 1 + max(alturas_hijos)
+
+    def grado(self, valor):
+        """Calcula el grado (número de hijos) de un nodo específico."""
+        nodo = self.buscar_nodo(valor)
+        if nodo:
+            return len(nodo.hijos)
+        else:
+            return None
+
+def menu():
+    print("\n--- Menú ---")
+    print("1. Agregar nodo")
+    print("2. Ver datos del árbol")
+    print("3. Salir")
+    return input("Seleccione una opción: ")
+
+def menu_ver_datos():
+    print("\n--- Ver datos del árbol ---")
+    print("1. Peso del árbol")
+    print("2. Orden del árbol")
+    print("3. Altura del árbol")
+    print("4. Ver grado de un nodo")
+    print("5. Volver al menú principal")
+    return input("Seleccione una opción: ")
+
+if __name__ == "__main__":
+    arbol = Arbol()
+
+    while True:
+        opcion = menu()
+        if opcion == "1":  # Agregar nodo
+            valor = input("Ingrese el valor del nodo: ")
+            if arbol.raiz is None:
+                arbol.agregar_nodo(valor)
+                print(f"Nodo raíz '{valor}' agregado.")
+            else:
+                nodos_existentes = arbol.listar_nodos()
+                print("\nSeleccione el nodo padre:")
+                for i, (nodo_valor, nivel) in enumerate(nodos_existentes):
+                    print(f"{i + 1}. {'  ' * nivel}{nodo_valor}")
+                seleccion = input("Ingrese el número del nodo padre: ")
+                try:
+                    indice = int(seleccion) - 1
+                    padre_valor = nodos_existentes[indice][0]
+                    padre = arbol.buscar_nodo(padre_valor)
+                    if padre:
+                        arbol.agregar_nodo(valor, padre)
+                        print(f"Nodo '{valor}' agregado como hijo de '{padre_valor}'.")
+                    else:
+                        print(f"No se encontró el nodo padre con valor '{padre_valor}'.")
+                except (ValueError, IndexError):
+                    print("Selección no válida.")
+
+        elif opcion == "2":  # Ver datos del árbol
+            if arbol.raiz is None:
+                print("No hay un árbol creado.")
+            else:
+                while True:
+                    opcion_ver = menu_ver_datos()
+                    if opcion_ver == "1":
+                        print("Peso del árbol:", arbol.peso())
+                    elif opcion_ver == "2":
+                        print("Orden del árbol:", arbol.orden())
+                    elif opcion_ver == "3":
+                        print("Altura del árbol:", arbol.altura())
+                    elif opcion_ver == "4":  # Ver grado de un nodo
+                        nodos_existentes = arbol.listar_nodos()
+                        print("\nSeleccione el nodo para calcular su grado:")
+                        for i, (nodo_valor, nivel) in enumerate(nodos_existentes):
+                            print(f"{i + 1}. {'  ' * nivel}{nodo_valor}")
+                        seleccion = input("Ingrese el número del nodo: ")
+                        try:
+                            indice = int(seleccion) - 1
+                            nodo_valor = nodos_existentes[indice][0]
+                            grado = arbol.grado(nodo_valor)
+                            print(f"El grado del nodo '{nodo_valor}' es: {grado}")
+                        except (ValueError, IndexError):
+                            print("Selección no válida.")
+                    elif opcion_ver == "5":
+                        break
+                    else:
+                        print("Opción no válida. Intente de nuevo.")
+
+        elif opcion == "3":  # Salir
+            print("Saliendo del programa...")
+            break
+
+        else:
+
+            print("Opción no válida. Intente de nuevo.")
